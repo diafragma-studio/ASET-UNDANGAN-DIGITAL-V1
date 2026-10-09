@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title id="titleWeb">Undangan Pernikahan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;550;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ================= 0. IMPORT CUSTOM FONT GITHUB (MONIMER SERIF) ================= */
+        @font-face {
+            font-family: 'MonimerSerif';
+            src: url('https://cdn.jsdelivr.net/gh/rifaiclip890/ASET-UNDANGAN-DIGITAL/MonimerSerif.otf') format('opentype');
+        }
+
+        /* --- 1. PENGATURAN DASAR & SCROLL --- */
+        ::-webkit-scrollbar { display: none; }
+        html { overflow-y: scroll; -ms-overflow-style: none; scrollbar-width: none; }
+        body { font-family: 'Montserrat', sans-serif; background-color: #d1d1d1; margin: 0; padding: 0; display: flex; justify-content: center; }
+        
+        .mobile-container {
+            width: 100%; max-width: 480px; background-color: #fff8f0; position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.2); margin: 0 auto; overflow-x: hidden;
+        }
+        .kunci-scroll { height: 100vh; height: 100svh; overflow: hidden; }
+
+        /* --- WARNA OVERLAY & GRADASI PATAHAN --- */
+        .overlay-standar { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(255, 248, 240, 0.85); z-index: 1; pointer-events: none; }
+        .transisi-seamless { position: absolute; top: 0; left: 0; width: 100%; height: 150px; background: linear-gradient(to bottom, rgba(255, 248, 240, 1) 0%, rgba(255, 248, 240, 0) 100%); z-index: 2; pointer-events: none; }
+        .gradasi-patahan-bawah { position: absolute; bottom: -2px; left: 0; width: 100%; height: 100px; background: linear-gradient(to top, rgba(235, 222, 205, 1) 0%, rgba(235, 222, 205, 0) 100%); z-index: 2; pointer-events: none; }
+        .gradasi-patahan-atas { position: absolute; top: -2px; left: 0; width: 100%; height: 100px; background: linear-gradient(to bottom, rgba(235, 222, 205, 1) 0%, rgba(235, 222, 205, 0) 100%); z-index: 2; pointer-events: none; }
+        .gelombang-pemisah { position: absolute; top: 0; left: 0; width: 100%; height: auto; z-index: 2; pointer-events: none; }
+
+        /* --- ORNAMEN SUDUT --- */
+        .ornamen { position: absolute; width: 185px; z-index: 10; pointer-events: none; }
+        .ornamen-kecil { width: 145px; } 
+        .ornamen-frame-3 { width: 140px; }
+        .ornamen-galeri { width: 110px; } 
+        .ornamen-sambung { top: -40px; } 
+        .pos-tl { top: -20px; left: -20px; } 
+        .pos-tr { top: -20px; right: -20px; transform: scaleX(-1); } 
+        .pos-bl { bottom: -20px; left: -20px; transform: scaleY(-1); } 
+        .pos-br { bottom: -20px; right: -20px; transform: scale(-1); } 
+
+        /* --- VARIASI ANIMASI SCROLL --- */
+        .anim-hidden { opacity: 0; visibility: hidden; will-change: transform, opacity; }
+        .show-anim { visibility: visible; }
+        .show-anim.fade-up { animation: fadeUp 0.9s ease-out forwards; }
+        .show-anim.slide-down { animation: slideDown 0.9s ease-out forwards; }
+        .show-anim.slide-left { animation: slideLeft 0.9s ease-out forwards; }
+        .show-anim.slide-right { animation: slideRight 0.9s ease-out forwards; }
+        .show-anim.pop-up { animation: popUp 0.9s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-40px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideLeft { from { opacity: 0; transform: translateX(50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes slideRight { from { opacity: 0; transform: translateX(-50px); } to { opacity: 1; transform: translateX(0); } }
+        @keyframes popUp { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+
+        .d-1 { animation-delay: 0.1s; } .d-2 { animation-delay: 0.25s; } .d-3 { animation-delay: 0.4s; } .d-4 { animation-delay: 0.55s; } .d-5 { animation-delay: 0.7s; }
+
+        /* ================= CSS DESAIN FRAME ================= */
+        .sampul-depan { position: absolute; top: 0; left: 0; width: 100%; height: 100vh; height: 100svh; z-index: 999; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; transition: transform 1.2s cubic-bezier(0.65, 0, 0.35, 1); }
+        .sampul-terbuka { transform: translateY(-100vh); }
+        .bg-gambar { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; pointer-events: none; }
+        .area-bingkai-sampul { position: relative; width: 250px; height: 250px; margin-top: -10px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; z-index: 3; }
+        .bunga-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; object-fit: contain; }
+        .foto-profil-sampul { width: 175px; height: 175px; border-radius: 50%; object-fit: cover; position: relative; z-index: 1; }
+        .teks-we-invite { font-size: 13px; color: #555; margin-top: -40px; margin-bottom: 10px; font-weight: 600; position: relative; z-index: 3; }
+        .nama-mempelai-sampul { font-family: 'MonimerSerif', serif; font-size: 2.8em; color: #4a3623; margin: 5px 0; position: relative; z-index: 3; font-weight: normal; text-align: center;}
+        .teks-sambutan { font-size: 13px; color: #444; font-weight: 600; margin: 5px 30px 15px 30px; line-height: 1.5; text-align: center; position: relative; z-index: 3; }
+        .teks-kepada { font-size: 12px; color: #555; font-weight: 600; margin-bottom: 5px; position: relative; z-index: 3; }
+        .nama-tamu { font-size: 15px; color: #333; font-weight: 700; margin-bottom: 20px; position: relative; z-index: 3; }
+        .tombol-buka { background-color: #8c7355; color: white; border: none; padding: 12px 28px; border-radius: 25px; font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.15); position: relative; z-index: 10; }
+
+        .frame-isi { position: relative; min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; padding: 40px 20px; box-sizing: border-box; }
+        .judul-frame { font-family: 'MonimerSerif', serif; font-size: 2.2em; color: #4a3623; margin: 0 0 15px 0; position: relative; z-index: 3; text-align: center; font-weight: normal; }
+        .teks-pengantar-frame { font-size: 11px; font-weight: 550; color: #555; text-align: center; line-height: 1.6; margin: 0 25px 25px 25px; position: relative; z-index: 3; }
+
+        .area-bingkai-frame-1 { position: relative; width: 250px; height: 250px; margin-bottom: 5px; display: flex; align-items: center; justify-content: center; z-index: 3; }
+        .foto-profil-frame-1 { width: 185px; height: 185px; border-radius: 50%; object-fit: cover; position: relative; z-index: 1; }
+        .teks-the-wedding { font-family: 'MonimerSerif', serif; font-size: 2.2em; color: #4a3623; margin: 10px 0 15px 0; position: relative; z-index: 3; line-height: 1.2; text-align: center; font-weight: normal; font-variant-ligatures: none; -webkit-font-variant-ligatures: none; font-feature-settings: "liga" 0, "dlig" 0; }
+        .gambar-teks-arab { width: 85%; max-width: 300px; object-fit: contain; position: relative; z-index: 3; margin: 10px 0 15px 0; }
+        .teks-terjemahan { font-size: 10px; font-weight: 550; color: #555; text-align: center; line-height: 1.6; margin: 0 20px 15px 20px; position: relative; z-index: 3; }
+        .teks-sumber { font-size: 11px; color: #111; font-weight: 700; position: relative; z-index: 3; }
+
+        .teks-salam { font-family: 'MonimerSerif', serif; font-size: 2.0em; color: #4a3623; margin: 25px 0 20px 0; position: relative; z-index: 3; text-align: center; font-weight: normal; }
+        .blok-profil { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 3; margin-bottom: 5px; width: 100%; }
+        .blok-profil-bawah { margin-bottom: 25px; } 
+        .area-bingkai-profil { position: relative; width: 190px; height: 190px; margin-bottom: 10px; display: flex; align-items: center; justify-content: center; z-index: 3; }
+        .foto-profil-individu { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; position: relative; z-index: 1; }
+        .nama-individu { font-family: 'MonimerSerif', serif; font-size: 1.9em; color: #4a3623; margin: 0 0 5px 0; text-align: center; font-weight: normal; }
+        .detail-individu { font-size: 10px; font-weight: 550; color: #666; text-align: center; line-height: 1.5; margin: 0; padding: 0 20px;}
+        .simbol-dan { font-family: 'MonimerSerif', serif; font-size: 2.2em; color: #d4af37; margin: 5px 0; position: relative; z-index: 3; font-weight: normal; }
+
+        .kartu-acara { background: rgba(255, 248, 240, 0.9); border-radius: 12px; padding: 15px; margin-bottom: 15px; width: 85%; box-shadow: 0 4px 10px rgba(0,0,0,0.08); position: relative; z-index: 3; text-align: center; }
+        .judul-acara { font-family: 'MonimerSerif', serif; font-size: 1.5em; color: #8c7355; margin: 0 0 10px 0; font-weight: normal; }
+        .tanggal-acara { font-size: 12px; font-weight: 700; color: #333; margin: 0 0 5px 0; }
+        .waktu-acara { font-size: 11px; font-weight: 600; color: #666; margin: 0 0 10px 0; }
+        .lokasi-acara { font-size: 10px; font-weight: 550; color: #555; line-height: 1.5; margin: 0 0 15px 0; }
+        .tombol-maps { display: inline-block; background-color: #a3876a; color: white; text-decoration: none; padding: 8px 22px; border-radius: 20px; font-size: 11px; font-weight: 700; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: background 0.3s; }
+        .tombol-maps:hover { background-color: #8c7355; }
+
+        .grid-galeri { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; width: 95%; max-width: 400px; position: relative; z-index: 3; }
+        .foto-galeri { width: 100%; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 6px; box-shadow: 0 4px 8px rgba(0,0,0,0.15); border: 2px solid rgba(255, 248, 240, 0.95); }
+
+        .form-tamu { width: 85%; max-width: 340px; background: rgba(255, 255, 255, 0.9); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); position: relative; z-index: 3; display: flex; flex-direction: column; gap: 12px; }
+        .grup-input { display: flex; flex-direction: column; text-align: left; }
+        .label-input { font-size: 11px; font-weight: 700; color: #4a3623; margin-bottom: 5px; padding-left: 2px; }
+        .input-form { font-family: 'Montserrat', sans-serif; font-size: 12px; padding: 12px; border: 1px solid #d1c0a8; border-radius: 8px; background-color: #fff; color: #333; outline: none; transition: 0.3s; }
+        .input-form:focus { border-color: #8c7355; box-shadow: 0 0 5px rgba(140, 115, 85, 0.3); }
+        .textarea-form { resize: none; height: 70px; }
+        .tombol-kirim { background-color: #8c7355; color: white; border: none; padding: 12px; border-radius: 20px; font-family: 'Montserrat', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.15); transition: background 0.3s; margin-top: 5px; }
+
+        .kartu-atm { width: 85%; max-width: 340px; background: linear-gradient(135deg, #ffffff 0%, #f3f3f3 100%); border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.15); position: relative; z-index: 3; display: flex; flex-direction: column; gap: 12px; border: 1px solid rgba(0,0,0,0.05); }
+        .header-kartu { display: flex; justify-content: space-between; align-items: flex-start; }
+        .chip-kartu { width: 35px; height: 25px; background: linear-gradient(135deg, #e4c47f, #b99335); border-radius: 4px; position: relative; }
+        .chip-kartu::after { content: ''; position: absolute; top: 6px; bottom: 6px; left: 10px; right: 10px; border: 1px solid rgba(0,0,0,0.15); border-radius: 2px; }
+        .logo-bank { height: 22px; width: auto; max-width: 80px; object-fit: contain; }
+        .info-kartu { text-align: left; margin-top: 5px; }
+        .nomor-rekening { font-size: 16px; font-weight: 700; color: #444; font-family: 'Courier New', Courier, monospace; letter-spacing: 2px; margin: 0 0 5px 0; }
+        .nama-rekening { font-size: 11px; font-weight: 600; color: #777; text-transform: uppercase; margin: 0; }
+        .footer-kartu { display: flex; justify-content: flex-end; }
+        .tombol-copy { background-color: #b09e8a; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: 0.3s; font-family: 'Montserrat', sans-serif; }
+        .tombol-copy:hover { background-color: #8c7355; }
+        .ikon-copy { width: 12px; height: 12px; fill: currentColor; }
+
+        .wadah-utama-ucapan { width: 85%; max-width: 360px; height: 380px; overflow: hidden; position: relative; z-index: 3; border-radius: 12px; box-sizing: border-box; background: transparent; }
+        .jalur-scroll { width: 100%; display: flex; flex-direction: column; gap: 12px; padding: 5px 10px; box-sizing: border-box; }
+        .kartu-ucapan { background: rgba(255, 255, 255, 0.95); border-left: 4px solid #8c7355; padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); text-align: left; flex-shrink: 0; }
+        .ucapan-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 5px; }
+        .ucapan-nama { font-size: 13px; font-weight: 700; color: #4a3623; margin: 0; }
+        .ucapan-teks { font-size: 11px; line-height: 1.6; color: #555; margin: 0; font-weight: 500;}
+        .wadah-utama-ucapan::before, .wadah-utama-ucapan::after { content: ""; position: absolute; left: 0; right: 0; height: 20px; z-index: 4; pointer-events: none; }
+        .wadah-utama-ucapan::before { top: 0; background: linear-gradient(to bottom, rgba(235, 222, 205, 1), rgba(235, 222, 205, 0)); }
+        .wadah-utama-ucapan::after { bottom: 0; background: linear-gradient(to top, rgba(235, 222, 205, 1), rgba(235, 222, 205, 0)); }
+
+        .footer-bisnis { width: 100%; background-color: #111111; padding: 35px 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 10; border-top: 3px solid #8c7355; }
+        .logo-footer { height: 85px; object-fit: contain; margin-bottom: 12px; }
+        .teks-footer { font-family: 'Montserrat', sans-serif; font-size: 10.5px; color: #d1c0a8; line-height: 1.4; text-align: center; max-width: 320px; margin: 0; font-weight: 400; letter-spacing: 0.5px; }
+        .teks-wa-footer { display: block; margin-top: 3px; font-size: 12px; font-weight: 700; color: #f0e6d8; letter-spacing: 1px; }
+
+        .tombol-musik { position: fixed; bottom: 20px; right: 20px; width: 45px; height: 45px; background: rgba(140, 115, 85, 0.85); border-radius: 50%; display: none; align-items: center; justify-content: center; z-index: 1000; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 2px solid rgba(255,255,255,0.3); animation: putarMusik 4s linear infinite; }
+        .ikon-musik { width: 22px; height: 22px; fill: white; }
+        .musik-berhenti { animation-play-state: paused; opacity: 0.6; }
+        @keyframes putarMusik { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    
+    <audio id="laguLatar" loop preload="auto">
+        <source id="sourceLagu" src="" type="audio/mpeg">
+    </audio>
+
+    <div id="tombolMusikLatar" class="tombol-musik">
+        <svg class="ikon-musik" viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+    </div>
+
+    <div class="mobile-container kunci-scroll" id="layarUtama">
+        
+        <!-- SAMPUL DEPAN -->
+        <div id="sampulDepan" class="sampul-depan">
+            <img id="bgSampulHTML" class="bg-gambar" alt="">
+            <div class="overlay-standar"></div>
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen pos-tl" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen pos-br" alt="">
+            <p class="teks-we-invite">We Invite You To</p>
+            <div class="area-bingkai-sampul">
+                <img src="https://i.ibb.co.com/0jzZsmDz/ornamen-border-bulat.png" class="bunga-overlay" alt="">
+                <img id="fotoSampulHTML" class="foto-profil-sampul" alt="">
+            </div>
+            <h1 class="nama-mempelai-sampul" id="namaMempelaiUtama"></h1>
+            <p class="teks-sambutan">Tanpa Mengurangi Rasa Hormat, Kami Mengundang Bapak/Ibu/Saudara/i untuk Hadir di Acara Kami.</p>
+            <p class="teks-kepada">Kepada:</p>
+            <!-- ID ini akan diisi secara otomatis oleh JavaScript di bawah -->
+            <p class="nama-tamu" id="namaTamuUndangan">Bapak/Ibu/Saudara/i</p>
+            <button id="btnBukaUndangan" class="tombol-buka">Buka Undangan</button>
+        </div>
+
+        <!-- FRAME 1 (AR-RUM) -->
+        <div class="frame-isi">
+            <img id="bgFrame1HTML" class="bg-gambar" alt="">
+            <div class="overlay-standar"></div>
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen pos-tl" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen pos-tr" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen pos-bl" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen pos-br" alt="">
+
+            <div class="area-bingkai-frame-1 anim-hidden pop-up d-1">
+                <img src="https://i.ibb.co.com/0jzZsmDz/ornamen-border-bulat.png" class="bunga-overlay" alt="">
+                <img id="fotoFrame1HTML" class="foto-profil-frame-1" alt="">
+            </div>
+            <h2 class="teks-the-wedding anim-hidden fade-up d-2">T<span>h</span>e Wedding Of<br><span id="namaMempelaiFrame1"></span></h2>
+            <img src="https://i.ibb.co.com/B2pnFjX3/surat-ar-rum.png" class="gambar-teks-arab anim-hidden slide-down d-3" alt="Teks Arab Ar-Rum">
+            <p class="teks-terjemahan anim-hidden slide-left d-4">Di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari (jenis) dirimu sendiri agar kamu merasa tenteram kepadanya. Dia menjadikan di antaramu rasa cinta dan kasih sayang. Sesungguhnya pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir.</p>
+            <p class="teks-sumber anim-hidden slide-right d-5">- Ar-Rum : Ayat 21 -</p>
+        </div>
+
+        <!-- FRAME 2 (PROFIL MEMPELAI) -->
+        <div class="frame-isi">
+            <img id="bgFrame2HTML" class="bg-gambar" alt="">
+            <div class="overlay-standar"></div>
+            <div class="transisi-seamless"></div>
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen pos-tl" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen pos-tr" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen ornamen-kecil pos-bl" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen ornamen-kecil pos-br" alt="">
+
+            <h2 class="teks-salam anim-hidden slide-down d-1">Assalamualaikum</h2>
+            <p class="teks-pengantar-frame anim-hidden fade-up d-2">Atas berkat Rahmat Allah SWT, tanpa mengurangi rasa hormat kami mengundang Bapak/Ibu/Saudara/i serta kerabat sekalian untuk menghadiri acara pernikahan kami:</p>
+
+            <div class="blok-profil anim-hidden slide-right d-3">
+                <div class="area-bingkai-profil">
+                    <img src="https://i.ibb.co.com/0jzZsmDz/ornamen-border-bulat.png" class="bunga-overlay" alt="">
+                    <img id="fotoPriaHTML" class="foto-profil-individu" alt="">
+                </div>
+                <h3 class="nama-individu" id="namaLengkapPriaHTML"></h3>
+                <p class="detail-individu" id="detailPriaHTML"></p>
+            </div>
+
+            <h2 class="simbol-dan anim-hidden pop-up d-4">&</h2>
+
+            <div class="blok-profil blok-profil-bawah anim-hidden slide-left d-5">
+                <div class="area-bingkai-profil">
+                    <img src="https://i.ibb.co.com/0jzZsmDz/ornamen-border-bulat.png" class="bunga-overlay" alt="">
+                    <img id="fotoWanitaHTML" class="foto-profil-individu" alt="">
+                </div>
+                <h3 class="nama-individu" id="namaLengkapWanitaHTML"></h3>
+                <p class="detail-individu" id="detailWanitaHTML"></p>
+            </div>
+        </div>
+
+        <!-- FRAME 3 (JADWAL ACARA) -->
+        <div class="frame-isi">
+            <img id="bgFrame3HTML" class="bg-gambar" alt="">
+            <div class="overlay-standar"></div>
+            <div class="transisi-seamless"></div> 
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen ornamen-frame-3 pos-tl" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen ornamen-frame-3 pos-tr" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen ornamen-frame-3 pos-bl" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen ornamen-frame-3 pos-br" alt="">
+
+            <h2 class="judul-frame anim-hidden slide-down d-1">Save the Date</h2>
+
+            <div class="kartu-acara anim-hidden slide-right d-2">
+                <h3 class="judul-acara" id="acara1Judul"></h3>
+                <p class="tanggal-acara" id="acara1Tanggal"></p>
+                <p class="waktu-acara" id="acara1Waktu"></p>
+                <p class="lokasi-acara" id="acara1Lokasi"></p>
+                <a id="acara1Maps" target="_blank" class="tombol-maps">Maps Lokasi Acara</a>
+            </div>
+
+            <div class="kartu-acara anim-hidden slide-left d-3">
+                <h3 class="judul-acara" id="acara2Judul"></h3>
+                <p class="tanggal-acara" id="acara2Tanggal"></p>
+                <p class="waktu-acara" id="acara2Waktu"></p>
+                <p class="lokasi-acara" id="acara2Lokasi"></p>
+                <a id="acara2Maps" target="_blank" class="tombol-maps">Maps Lokasi Acara</a>
+            </div>
+
+            <div class="kartu-acara anim-hidden fade-up d-4">
+                <h3 class="judul-acara" id="acara3Judul"></h3>
+                <p class="tanggal-acara" id="acara3Tanggal"></p>
+                <p class="waktu-acara" id="acara3Waktu"></p>
+                <p class="lokasi-acara" id="acara3Lokasi"></p>
+                <a id="acara3Maps" target="_blank" class="tombol-maps">Maps Lokasi Acara</a>
+            </div>
+        </div>
+
+        <!-- FRAME 4 (GALERI) -->
+        <div class="frame-isi">
+            <img id="bgFrame4HTML" class="bg-gambar" alt="">
+            <div class="overlay-standar"></div>
+            <div class="transisi-seamless"></div> 
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen ornamen-galeri pos-tl" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen ornamen-galeri pos-tr" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen ornamen-galeri pos-bl" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen ornamen-galeri pos-br" alt="">
+
+            <h2 class="judul-frame anim-hidden slide-down d-1">Galeri Kita Berdua</h2>
+
+            <div class="grid-galeri">
+                <img id="galeri1" class="foto-galeri anim-hidden pop-up d-2" alt="">
+                <img id="galeri2" class="foto-galeri anim-hidden pop-up d-2" alt="">
+                <img id="galeri3" class="foto-galeri anim-hidden pop-up d-2" alt="">
+                <img id="galeri4" class="foto-galeri anim-hidden pop-up d-3" alt="">
+                <img id="galeri5" class="foto-galeri anim-hidden pop-up d-3" alt="">
+                <img id="galeri6" class="foto-galeri anim-hidden pop-up d-3" alt="">
+                <img id="galeri7" class="foto-galeri anim-hidden pop-up d-4" alt="">
+                <img id="galeri8" class="foto-galeri anim-hidden pop-up d-4" alt="">
+                <img id="galeri9" class="foto-galeri anim-hidden pop-up d-4" alt="">
+            </div>
+        </div>
+
+        <!-- FRAME 5 (KEHADIRAN) -->
+        <div class="frame-isi">
+            <img id="bgFrame5HTML" class="bg-gambar" alt="">
+            <div class="transisi-seamless"></div> 
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen ornamen-sambung pos-tl" alt="">
+            <img src="https://i.ibb.co.com/t7BFkGF/ornamen-bunga-atas.png" class="ornamen ornamen-sambung pos-tr" alt="">
+
+            <h2 class="judul-frame anim-hidden slide-down d-1">Kehadiran</h2>
+
+            <form id="formKehadiranTamu" class="form-tamu anim-hidden fade-up d-2" method="POST" target="hidden_iframe">
+                <div class="grup-input">
+                    <label for="namaTamu" class="label-input">Nama Tamu</label>
+                    <input type="text" id="namaTamu" name="nama" class="input-form" placeholder="Tuliskan nama Anda" required>
+                </div>
+                <div class="grup-input">
+                    <label for="ucapanTamu" class="label-input">Ucapan & Doa</label>
+                    <textarea id="ucapanTamu" name="ucapan" class="input-form textarea-form" placeholder="Berikan ucapan untuk mempelai" required></textarea>
+                </div>
+                <div class="grup-input">
+                    <label for="opsiKehadiran" class="label-input">Konfirmasi Kehadiran</label>
+                    <select id="opsiKehadiran" name="kehadiran" class="input-form" required>
+                        <option value="" disabled selected>Apakah Anda akan hadir?</option>
+                        <option value="Hadir">Hadir</option>
+                        <option value="Tidak Hadir">Tidak Hadir</option>
+                    </select>
+                </div>
+                <button type="submit" id="btnKirimUcapan" class="tombol-kirim">Kirim Ucapan</button>
+            </form>
+
+            <iframe name="hidden_iframe" id="hidden_iframe" style="display:none;" onload="if(submitted) { alert('Terima kasih, ucapan dan konfirmasi kehadiran Anda berhasil dikirim!'); document.getElementById('formKehadiranTamu').reset(); document.getElementById('btnKirimUcapan').innerText = 'Kirim Ucapan'; document.getElementById('btnKirimUcapan').style.backgroundColor = '#8c7355'; loadUcapanDariSheet(); submitted = false; }"></iframe>
+            <div class="gradasi-patahan-bawah"></div>
+        </div>
+
+        <!-- FRAME 6 (E-WALLET / KARTU ATM) -->
+        <div class="frame-isi">
+            <svg class="gelombang-pemisah anim-hidden slide-down d-1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 250">
+              <path fill="rgba(140, 115, 85, 0.15)" d="M0,96L48,112C96,128,192,160,288,154.7C384,149,480,107,576,96C672,85,768,107,864,122.7C960,139,1056,149,1152,138.7C1248,128,1344,96,1392,80L1440,64L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+              <path fill="rgba(140, 115, 85, 0.25)" d="M0,32L48,53.3C96,75,192,117,288,117.3C384,117,480,75,576,74.7C672,75,768,117,864,128C960,139,1056,117,1152,96C1248,75,1344,53,1392,42.7L1440,32L1440,0L1392,0C1344,0,1248,0,1152,0C1056,0,960,0,864,0C768,0,672,0,576,0C480,0,384,0,288,0C192,0,96,0,48,0L0,0Z"></path>
+            </svg>
+            
+            <img id="bgFrame6HTML" class="bg-gambar" alt="">
+            <div class="gradasi-patahan-atas"></div>
+
+            <h2 class="judul-frame anim-hidden slide-down d-1" style="margin-top: 60px;">Tanda Kasih</h2>
+            <p class="teks-pengantar-frame anim-hidden fade-up d-2">Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Namun jika Bapak/Ibu/Saudara/i ingin memberikan tanda kasih, dapat melalui nomer E-Wallet dan Rekening di bawah ini:</p>
+
+            <div class="kartu-atm anim-hidden slide-right d-3">
+                <div class="header-kartu"><div class="chip-kartu"></div><img src="https://i.ibb.co.com/0pKby9cY/GOPAY.png" class="logo-bank" alt="GoPay"></div>
+                <div class="info-kartu"><p class="nomor-rekening" id="rek1Nomor"></p><p class="nama-rekening" id="rek1Nama"></p></div>
+                <div class="footer-kartu"><button class="tombol-copy" onclick="salinTeks('rek1Nomor', this)"><svg class="ikon-copy" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy</button></div>
+            </div>
+
+            <div class="kartu-atm anim-hidden slide-left d-4">
+                <div class="header-kartu"><div class="chip-kartu"></div><img src="https://i.ibb.co.com/sdfVTmyN/DANA.png" class="logo-bank" alt="DANA"></div>
+                <div class="info-kartu"><p class="nomor-rekening" id="rek2Nomor"></p><p class="nama-rekening" id="rek2Nama"></p></div>
+                <div class="footer-kartu"><button class="tombol-copy" onclick="salinTeks('rek2Nomor', this)"><svg class="ikon-copy" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy</button></div>
+            </div>
+
+            <div class="kartu-atm anim-hidden fade-up d-5">
+                <div class="header-kartu"><div class="chip-kartu"></div><img src="https://i.ibb.co.com/WNpWbv0f/BCA.png" class="logo-bank" alt="BCA"></div>
+                <div class="info-kartu"><p class="nomor-rekening" id="rek3Nomor"></p><p class="nama-rekening" id="rek3Nama"></p></div>
+                <div class="footer-kartu"><button class="tombol-copy" onclick="salinTeks('rek3Nomor', this)"><svg class="ikon-copy" viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg> Copy</button></div>
+            </div>
+            <div class="gradasi-patahan-bawah"></div>
+        </div>
+
+        <!-- FRAME 7 (DAFTAR UCAPAN) -->
+        <div class="frame-isi">
+            <img id="bgFrame7HTML" class="bg-gambar" alt="">
+            <div class="gradasi-patahan-atas"></div>
+            <h2 class="judul-frame anim-hidden slide-down d-1">Ucapan & Doa</h2>
+            <p class="teks-pengantar-frame anim-hidden fade-up d-2" style="margin-bottom:15px;">Terima kasih atas segala doa dan ucapan manis yang telah diberikan untuk pernikahan kami.</p>
+
+            <div class="wadah-utama-ucapan anim-hidden pop-up d-3" id="wadahUtamaUcapan">
+                <div class="jalur-scroll" id="jalurScrollUcapan">
+                    <div class="kartu-ucapan">
+                        <div class="ucapan-header"><h4 class="ucapan-nama">Memuat data...</h4></div>
+                        <p class="ucapan-teks">Mohon tunggu sebentar, sedang menyinkronkan data dengan Google Sheets.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER BISNIS -->
+        <div class="footer-bisnis">
+            <img src="https://i.ibb.co.com/tM7D14zp/20250109-173836.png" class="logo-footer" alt="Logo Dokumentasi">
+            <p class="teks-footer">Menerima jasa dokumentasi foto, video, undangan cetak, dan undangan online. <br><span class="teks-wa-footer">WA 082224209867</span></p>
+        </div>
+
+    </div>
+
+    <script>
+        // =========================================================================
+        // PUSAT KENDALI (CONTROL CENTER)
+        // =========================================================================
+        const DataKlien = {
+            panggilanPria: "Hamid",
+            panggilanWanita: "Esti",
+            namaLengkapPria: "Hamid Rifai",
+            detailOrtuPria: "Putra dari Bapak Slamet Fahrudin & Ibu Painem<br>Alamat: Desa Contoh RT 01/RW 02, Kec. Sampel, Kab. Purworejo",
+            namaLengkapWanita: "Esti Lestari Setiyoningsih",
+            detailOrtuWanita: "Putri dari Bapak Aya Sumarno & Ibu Manisah<br>Alamat: Jl. Mawar No. 123, Desa Maju Jaya, Purworejo",
+
+            linkLaguMP3: "https://cdn.jsdelivr.net/gh/rifaiclip890/ASET-UNDANGAN-DIGITAL/LAMUNAN.mp3",
+            linkGoogleSheetURL: "https://script.google.com/macros/s/AKfycbzV7Yy-nAHdKNT5On11k7Qyc7lDMn9hYqxFOF5p2qxIz70KOcevugNNOjq8chmHr44Z/exec",
+
+            acara1_Judul: "Tasyakuran Mempelai Pria",
+            acara1_Tanggal: "Sabtu, 21 Desember 2026",
+            acara1_Waktu: "Pukul 09:00 WIB - Selesai",
+            acara1_Lokasi: "Kediaman Mempelai Pria<br>Desa Contoh RT 01/RW 02, Kec. Sampel, Kab. Purworejo",
+            acara1_Maps: "https://maps.app.goo.gl/6AYhaAA3KUwUPHHSA",
+
+            acara2_Judul: "Tasyakuran Mempelai Wanita",
+            acara2_Tanggal: "Minggu, 22 Desember 2026",
+            acara2_Waktu: "Pukul 09:00 WIB - 15:00 WIB",
+            acara2_Lokasi: "Kediaman Mempelai Wanita<br>Jl. Mawar No. 123, Desa Maju Jaya, Purworejo",
+            acara2_Maps: "https://maps.app.goo.gl/6AYhaAA3KUwUPHHSA",
+
+            acara3_Judul: "Akad Nikah",
+            acara3_Tanggal: "Minggu, 22 Desember 2026",
+            acara3_Waktu: "Pukul 08:00 WIB - Selesai",
+            acara3_Lokasi: "Kediaman Mempelai Wanita<br>Jl. Mawar No. 123, Desa Maju Jaya, Purworejo",
+            acara3_Maps: "https://maps.app.goo.gl/6AYhaAA3KUwUPHHSA",
+
+            rek1_Gopay_Nama: "Hamid Rifai",
+            rek1_Gopay_Nomor: "082224209867",
+            rek2_Dana_Nama: "Esti Lestari Setiyoningsih",
+            rek2_Dana_Nomor: "085786218076",
+            rek3_BCA_Nama: "Esti Lestari Setiyoningsih",
+            rek3_BCA_Nomor: "6872373230",
+
+            fotoSampul: "https://i.ibb.co.com/kZscv1g/SAT-9714.jpg",
+            fotoFrame1: "https://i.ibb.co.com/xScnbYBN/20260927-074757.jpg",
+            fotoProfilPria: "https://i.ibb.co.com/T9zG6gQ/SAT-9824.jpg",
+            fotoProfilWanita: "https://i.ibb.co.com/cSgDpd99/SAT-9869.jpg",
+
+            bgSampul: "https://i.ibb.co.com/xScnbYBN/20260927-074757.jpg",
+            bgFrame1: "https://i.ibb.co.com/Gv5PH0L7/20260927-124725.jpg",
+            bgFrame2: "https://i.ibb.co.com/ksjfdKP9/20260927-123338.png",
+            bgFrame3: "https://i.ibb.co.com/DfCwVXz5/20260930-165753.png",
+            bgFrame4: "https://i.ibb.co.com/93yzqSCF/20261001-192659.png",
+            bgFrame5_6_7: "https://i.ibb.co.com/Tqh4fZ4C/background-frame-tamu.png",
+
+            fotoGaleri1: "https://i.ibb.co.com/JwkCn5tn/1.jpg",
+            fotoGaleri2: "https://i.ibb.co.com/RpmQ58CF/2.jpg",
+            fotoGaleri3: "https://i.ibb.co.com/C36gCFNz/3.jpg",
+            fotoGaleri4: "https://i.ibb.co.com/PvL8sJmL/4.png",
+            fotoGaleri5: "https://i.ibb.co.com/LhcDfD8Q/5.png",
+            fotoGaleri6: "https://i.ibb.co.com/qLTMQf5R/6.png",
+            fotoGaleri7: "https://i.ibb.co.com/N2zfbyTh/7.jpg",
+            fotoGaleri8: "https://i.ibb.co.com/nNtSrG6y/8.jpg",
+            fotoGaleri9: "https://i.ibb.co.com/whP57PtK/9.jpg"
+        };
+        // ======================= BATAS PUSAT KENDALI =========================
+
+        document.addEventListener("DOMContentLoaded", function() {
+            // --- FITUR BACA NAMA TAMU DARI URL LINK ---
+            const urlParams = new URLSearchParams(window.location.search);
+            const namaTamuDariLink = urlParams.get('kpd');
+            
+            if (namaTamuDariLink) {
+                // Tanda + otomatis diubah jadi spasi oleh URLSearchParams
+                document.getElementById("namaTamuUndangan").innerText = namaTamuDariLink;
+            } else {
+                // Default jika tidak ada parameter nama di link
+                document.getElementById("namaTamuUndangan").innerText = "Bapak/Ibu/Saudara/i";
+            }
+
+            // --- INJEKSI DATA LAINNYA ---
+            const namaGabungan = DataKlien.panggilanPria + " & " + DataKlien.panggilanWanita;
+            document.getElementById("titleWeb").innerText = "Undangan Pernikahan " + namaGabungan;
+            document.getElementById("namaMempelaiUtama").innerText = namaGabungan;
+            document.getElementById("namaMempelaiFrame1").innerText = namaGabungan;
+            
+            document.getElementById("namaLengkapPriaHTML").innerText = DataKlien.namaLengkapPria;
+            document.getElementById("detailPriaHTML").innerHTML = DataKlien.detailOrtuPria;
+            document.getElementById("namaLengkapWanitaHTML").innerText = DataKlien.namaLengkapWanita;
+            document.getElementById("detailWanitaHTML").innerHTML = DataKlien.detailOrtuWanita;
+
+            document.getElementById("formKehadiranTamu").action = DataKlien.linkGoogleSheetURL;
+
+            document.getElementById("sourceLagu").src = DataKlien.linkLaguMP3;
+            document.getElementById("laguLatar").load();
+
+            document.getElementById("acara1Judul").innerText = DataKlien.acara1_Judul;
+            document.getElementById("acara1Tanggal").innerText = DataKlien.acara1_Tanggal;
+            document.getElementById("acara1Waktu").innerText = DataKlien.acara1_Waktu;
+            document.getElementById("acara1Lokasi").innerHTML = DataKlien.acara1_Lokasi;
+            document.getElementById("acara1Maps").href = DataKlien.acara1_Maps;
+
+            document.getElementById("acara2Judul").innerText = DataKlien.acara2_Judul;
+            document.getElementById("acara2Tanggal").innerText = DataKlien.acara2_Tanggal;
+            document.getElementById("acara2Waktu").innerText = DataKlien.acara2_Waktu;
+            document.getElementById("acara2Lokasi").innerHTML = DataKlien.acara2_Lokasi;
+            document.getElementById("acara2Maps").href = DataKlien.acara2_Maps;
+
+            document.getElementById("acara3Judul").innerText = DataKlien.acara3_Judul;
+            document.getElementById("acara3Tanggal").innerText = DataKlien.acara3_Tanggal;
+            document.getElementById("acara3Waktu").innerText = DataKlien.acara3_Waktu;
+            document.getElementById("acara3Lokasi").innerHTML = DataKlien.acara3_Lokasi;
+            document.getElementById("acara3Maps").href = DataKlien.acara3_Maps;
+
+            document.getElementById("rek1Nama").innerText = DataKlien.rek1_Gopay_Nama;
+            document.getElementById("rek1Nomor").innerText = DataKlien.rek1_Gopay_Nomor;
+            document.getElementById("rek2Nama").innerText = DataKlien.rek2_Dana_Nama;
+            document.getElementById("rek2Nomor").innerText = DataKlien.rek2_Dana_Nomor;
+            document.getElementById("rek3Nama").innerText = DataKlien.rek3_BCA_Nama;
+            document.getElementById("rek3Nomor").innerText = DataKlien.rek3_BCA_Nomor;
+
+            document.getElementById("fotoSampulHTML").src = DataKlien.fotoSampul;
+            document.getElementById("fotoFrame1HTML").src = DataKlien.fotoFrame1;
+            document.getElementById("fotoPriaHTML").src = DataKlien.fotoProfilPria;
+            document.getElementById("fotoWanitaHTML").src = DataKlien.fotoProfilWanita;
+
+            document.getElementById("bgSampulHTML").src = DataKlien.bgSampul;
+            document.getElementById("bgFrame1HTML").src = DataKlien.bgFrame1;
+            document.getElementById("bgFrame2HTML").src = DataKlien.bgFrame2;
+            document.getElementById("bgFrame3HTML").src = DataKlien.bgFrame3;
+            document.getElementById("bgFrame4HTML").src = DataKlien.bgFrame4;
+            document.getElementById("bgFrame5HTML").src = DataKlien.bgFrame5_6_7;
+            document.getElementById("bgFrame6HTML").src = DataKlien.bgFrame5_6_7;
+            document.getElementById("bgFrame7HTML").src = DataKlien.bgFrame5_6_7;
+
+            document.getElementById("galeri1").src = DataKlien.fotoGaleri1;
+            document.getElementById("galeri2").src = DataKlien.fotoGaleri2;
+            document.getElementById("galeri3").src = DataKlien.fotoGaleri3;
+            document.getElementById("galeri4").src = DataKlien.fotoGaleri4;
+            document.getElementById("galeri5").src = DataKlien.fotoGaleri5;
+            document.getElementById("galeri6").src = DataKlien.fotoGaleri6;
+            document.getElementById("galeri7").src = DataKlien.fotoGaleri7;
+            document.getElementById("galeri8").src = DataKlien.fotoGaleri8;
+            document.getElementById("galeri9").src = DataKlien.fotoGaleri9;
+        });
+
+        // --- LOGIKA SISTEM ---
+        let submitted = false;
+        let dataUcapan = [];
+        let animasiScroll;
+        let posisiY = 0;
+        let isScrollPaused = false;
+        let isMusicPlaying = false;
+        
+        const laguLatar = document.getElementById('laguLatar');
+        const tombolMusikLatar = document.getElementById('tombolMusikLatar');
+
+        document.getElementById('btnBukaUndangan').addEventListener('click', function() {
+            const sampul = document.getElementById('sampulDepan');
+            const utama = document.getElementById('layarUtama');
+            
+            laguLatar.play();
+            isMusicPlaying = true;
+            tombolMusikLatar.style.display = 'flex';
+            
+            sampul.classList.add('sampul-terbuka');
+            setTimeout(() => {
+                utama.classList.remove('kunci-scroll');
+                sampul.style.display = 'none';
+
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) { entry.target.classList.add('show-anim'); }
+                    });
+                }, { threshold: 0.15 });
+
+                document.querySelectorAll('.anim-hidden').forEach((el) => observer.observe(el));
+                loadUcapanDariSheet();
+            }, 1200); 
+        });
+
+        tombolMusikLatar.addEventListener('click', function() {
+            if (isMusicPlaying) { laguLatar.pause(); tombolMusikLatar.classList.add('musik-berhenti'); } 
+            else { laguLatar.play(); tombolMusikLatar.classList.remove('musik-berhenti'); }
+            isMusicPlaying = !isMusicPlaying;
+        });
+
+        document.getElementById('formKehadiranTamu').addEventListener('submit', function(e) {
+            submitted = true;
+            const btnKirim = document.getElementById('btnKirimUcapan');
+            btnKirim.innerText = 'Mengirim...';
+            btnKirim.style.backgroundColor = '#6e5a42';
+        });
+
+        function salinTeks(idElemen, tombol) {
+            var teksNomor = document.getElementById(idElemen).innerText;
+            var elemenSementara = document.createElement("textarea");
+            elemenSementara.value = teksNomor;
+            document.body.appendChild(elemenSementara);
+            elemenSementara.select();
+            document.execCommand("copy");
+            document.body.removeChild(elemenSementara);
+            
+            var isiAwal = tombol.innerHTML;
+            tombol.innerHTML = "Tersalin ?";
+            tombol.style.backgroundColor = "#6e5a42";
+            
+            setTimeout(function() { tombol.innerHTML = isiAwal; tombol.style.backgroundColor = "#b09e8a"; }, 2000);
+        }
+
+        function renderUcapanSeamless() {
+            const jalur = document.getElementById('jalurScrollUcapan');
+            const wadah = document.getElementById('wadahUtamaUcapan');
+            if(dataUcapan.length === 0) return;
+
+            let blokHTML = '';
+            for(let i = dataUcapan.length - 1; i >= 0; i--) {
+                if(!dataUcapan[i].nama) continue; 
+                blokHTML += `<div class="kartu-ucapan"><div class="ucapan-header"><h4 class="ucapan-nama">${dataUcapan[i].nama}</h4></div><p class="ucapan-teks">${dataUcapan[i].ucapan}</p></div>`;
+            }
+
+            jalur.innerHTML = blokHTML + blokHTML;
+
+            wadah.addEventListener('mouseenter', () => isScrollPaused = true);
+            wadah.addEventListener('mouseleave', () => isScrollPaused = false);
+            wadah.addEventListener('touchstart', () => isScrollPaused = true);
+            wadah.addEventListener('touchend', () => { setTimeout(() => isScrollPaused = false, 1500); });
+
+            let tinggiSatuSet = jalur.scrollHeight / 2;
+            
+            function jalanAnimasi() {
+                if (!isScrollPaused) {
+                    posisiY -= 0.5; 
+                    if (Math.abs(posisiY) >= tinggiSatuSet) { posisiY = 0; }
+                    jalur.style.transform = `translateY(${posisiY}px)`;
+                }
+                animasiScroll = requestAnimationFrame(jalanAnimasi);
+            }
+            if(animasiScroll) cancelAnimationFrame(animasiScroll);
+            jalanAnimasi();
+        }
+
+        function loadUcapanDariSheet() {
+            const jalur = document.getElementById('jalurScrollUcapan');
+            fetch(DataKlien.linkGoogleSheetURL)
+            .then(res => res.json())
+            .then(data => {
+                if(data && data.length > 0) {
+                    dataUcapan = data;
+                    setTimeout(renderUcapanSeamless, 500);
+                } else {
+                    jalur.innerHTML = '<p style="text-align:center; font-size:12px; color:#555; margin-top:20px; font-family:\'Montserrat\', sans-serif;">Belum ada ucapan.</p>';
+                }
+            })
+            .catch(err => {
+                jalur.innerHTML = '<p style="text-align:center; font-size:12px; color:#555; margin-top:20px; font-family:\'Montserrat\', sans-serif;">Gagal memuat data ucapan.</p>';
+            });
+        }
+    </script>
+</body>
+</html>
